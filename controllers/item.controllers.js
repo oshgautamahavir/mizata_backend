@@ -1,8 +1,10 @@
 const Item = require('../models/item.model')
 
 const fetchItems = async (req, res) => {
+    const searchKey = req.query.search
+
     try {
-        const items = await Item.find({});
+        const items = await Item.find({name: {$regex: searchKey, $options: 'i'}}).sort({_id:-1});
         res.status(200).json(items);
     } catch (error) {
         res.status(500).json({ message: error.message });
