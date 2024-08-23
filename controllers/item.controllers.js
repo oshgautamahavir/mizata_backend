@@ -1,11 +1,21 @@
 const Item = require('../models/item.model')
 
+const SIZE_PER_REQUEST = 10; // Number of items to return
+
 const fetchItems = async (req, res) => {
     const searchKey = req.query.search
+    const top = parseInt(req.query.top) || 0;  // Number of items to skip or where to start
+    const bottom = SIZE_PER_REQUEST + top;
 
     try {
-        const items = await Item.find({name: {$regex: searchKey, $options: 'i'}}).sort({_id:-1});
-        res.status(200).json(items);
+        const count = await Item.countDocuments({});
+        console.log(count)
+        const items = await Item.find({name: {$regex: searchKey, $options: 'i'}})
+        .sort({_id:-1})
+        .skip(top)
+        .limit(bottom);
+
+        res.status(200).json({items, count});
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
