@@ -3,14 +3,22 @@ const Item = require('../models/item.model')
 const SIZE_PER_REQUEST = 10; // Number of items to return
 
 const fetchItems = async (req, res) => {
-    const searchKey = req.query.search
+    const searchKey = req.query.search;
     const top = parseInt(req.query.top) || 0;  // Number of items to skip or where to start
     const bottom = SIZE_PER_REQUEST + top;
 
+    let filters = {name: {$regex: searchKey, $options: 'i'}}
+
+    if (req.query.date) { // Check if date params is passed
+        const start = new Date(req.query.date);
+        let end = new Date(req.query.date)
+        end = end.setDate(end.getDate() + 1); // Add one day so we range of one day when querying
+        filters['createdAt'] = {$gte:start,$lt:end}
+    }
+
     try {
-        const count = await Item.countDocuments({});
-        console.log(count)
-        const items = await Item.find({name: {$regex: searchKey, $options: 'i'}})
+        const count = await Item.countDocuments(filters);
+        const items = await Item.find(filters)
         .sort({_id:-1})
         .skip(top)
         .limit(bottom);
