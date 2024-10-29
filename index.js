@@ -15,7 +15,7 @@ app.use(express.urlencoded({extended: false}));
 
 app.use('/api/items', itemRoute)
 
-mongoose.connect('mongodb+srv://oshgautamahavir:puXvGyNasiX8Kn8A@mizatadb.ru9n0.mongodb.net/?retryWrites=true&w=majority&appName=MizataDB');
+mongoose.connect('mongodb://localhost:27017/mizatadb');
     const db = mongoose.connection;
     db.on('error', console.error.bind(console, 'Connection error:'));
     db.once('open', function() {
