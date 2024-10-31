@@ -1,13 +1,14 @@
 const Item = require('../models/item.model')
 
-const SIZE_PER_REQUEST = 10; // Number of items to return
 
 const fetchItems = async (req, res) => {
-    const searchKey = req.query.search;
-    const top = parseInt(req.query.top) || 0;  // Number of items to skip or where to start
-    const bottom = SIZE_PER_REQUEST + top;
+    let filters = {}
 
-    let filters = {name: {$regex: searchKey, $options: 'i'}}
+    console.log('oten')
+
+    if (req.query.search) { // Check if search key is passed
+        filters['name'] = {$regex: req.query.search, $options: 'i'}
+    }
 
     if (req.query.date) { // Check if date params is passed
         const start = new Date(req.query.date);
@@ -20,8 +21,6 @@ const fetchItems = async (req, res) => {
         const count = await Item.countDocuments(filters);
         const items = await Item.find(filters)
         .sort({_id:-1})
-        .skip(top)
-        .limit(bottom);
 
         res.status(200).json({items, count});
     } catch (error) {
