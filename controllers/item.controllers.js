@@ -1,10 +1,7 @@
 const Item = require('../models/item.model')
 
-
 const fetchItems = async (req, res) => {
     let filters = {}
-
-    console.log('oten')
 
     if (req.query.search) { // Check if search key is passed
         filters['name'] = {$regex: req.query.search, $options: 'i'}
@@ -20,6 +17,7 @@ const fetchItems = async (req, res) => {
     try {
         const count = await Item.countDocuments(filters);
         const items = await Item.find(filters)
+        .limit(req.query.entries)
         .sort({_id:-1})
 
         res.status(200).json({items, count});
