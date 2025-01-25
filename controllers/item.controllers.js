@@ -4,15 +4,18 @@ const fetchItems = async (req, res) => {
     let filters = {}
 
     if (req.query.search) { // Check if search key is passed
-        filters['name'] = {$regex: req.query.search, $options: 'i'}
+        filters['name'] = {$regex: req.query.search, $options: 'i'};
     }
 
     if (req.query.date) { // Check if date params is passed
         const start = new Date(req.query.date);
-        let end = new Date(req.query.date)
+        let end = new Date(req.query.date);
         end = end.setDate(end.getDate() + 1); // Add one day so we range of one day when querying
-        filters['createdAt'] = {$gte:start,$lt:end}
+        filters['createdAt'] = {$gte:start,$lt:end};
     }
+
+    const statusArray = req.query.statuses.split(",");
+    filters['status'] = {$in:statusArray};
 
     try {
         const count = await Item.countDocuments(filters);
